@@ -47,7 +47,7 @@ const countOccurances = (arr, val) =>
 // Deep flattens an array.
 // Use recursion. Use Array.concat() with an empty array ([]) and the spread operator (...) to flatten an array. Recursively flatten each element that is an array.
 const deepFlatten = (arr) =>
-  arr.reduce((acc, val) => (Array.isArray(val) ? acc = acc.concat(deepFlatten(val)) : acc.push(val), acc), [])
+  arr.reduce((a ,v) => a.concat(Array.isArray(v) ? deepFlatten(v) : v), []);
 // standard answer
 const deepFlatten = (arr) => [].concat(...arr.map(v) => (Arra.isArray(v) ? deepFlatten(v) : v));
 
@@ -118,3 +118,58 @@ const findLast = (arr, fn) => arr.filter(fn).slice(-1)[0];
 // Use Array.map() to map each element to an array with its index and value. Use Array.filter() to remove elements for which fn returns falsey values, Array.slice(-1) to get the last one.
 const findLastIndex = (arr, fn) => arr.map((v, i) => [i, v]).filter(val => fn(val[1], val[0], arr)).slice(-1)[0][0]
 
+// flatten
+// Flattens an array up to the specified depth.
+// Use recursion, decrementing depth by 1 for each level of depth. Use Array.reduce() and Array.concat() to merge elements or arrays. Base case, for depth equal to 1 stops recursion. Omit the second argument, depth to flatten only to a depth of 1 (single flatten).
+const flatten = (arr, depth = 1) =>
+  arr.reduce((a, v) => a.concat(depth > 1 && Array.isArray(v) ? flatten(v, depth - 1) : v), []);
+
+// forEachRight
+// Executes a provided function once for each array element, starting from the array's last element.
+// Use Array.slice(0) to clone the given array, Array.reverse() to reverse it and Array.forEach() to iterate over the reversed array.
+const forEachRight = (arr, callback) =>
+  Array.slice().reverse().forEach(callback);
+
+// groupBy
+// Groups the elements of an array based on the given function.
+// Use Array.map() to map the values of an array to a function or property name. Use Array.reduce() to create an object, where the keys are produced from the mapped results.
+const groupBy = (arr, fn) =>
+  arr.map(typeof fn === 'function' ? fn : val => val[fn]).reduce((acc, v, i) => (acc[v] = (acc[v] || []).concat(arr[i]), acc) , {});
+
+// head
+// Returns the head of a list.
+// Use arr[0] to return the first element of the passed array.
+const head = arr => arr[0];
+
+// indexOfAll
+// Returns all indices of val in an array. If val never occurs, returns [].
+// Use Array.forEach() to loop over elements and Array.push() to store indices for matching elements. Return the array of indices.
+const indexOfAll = (arr, val) =>
+  Array.reduce((acc, v, i) => (v === val && acc.push(i), acc), []);
+
+// initial
+// Returns all the elements of an array except the last one.
+// Use arr.slice(0,-1) to return all but the last element of the array.
+const initial = arr => arr.slice(0, -1);
+
+// initialize2DArray
+// Initializes a 2D array of given width and height and value.
+// Use Array.map() to generate h rows where each is a new array of size w initialize with value. If the value is not provided, default to null.
+const initialize2DArray = (h, w, val = null) => Array.from({ length: h }).map(() => Array.from({ length: w }).fill(val));
+
+// initializeArrayWithRange
+// Initializes an array containing the numbers in the specified range where start and end are inclusive with their common difference step.
+// Use Array.from(Math.ceil((end+1-start)/step)) to create an array of the desired length(the amounts of elements is equal to (end-start)/step or (end+1-start)/step for inclusive end), Array.map() to fill with the desired values in a range. You can omit start to use a default value of 0. You can omit step to use a default value of 1.
+const initializeArrayWithRange = (end, start, step = 1) =>
+  Array.from({ length: Math.ceil((end + 1 - start) / step )}).map((v, i) => i * step + start);
+
+// initializeArrayWithRangeRight
+// Initializes an array containing the numbers in the specified range (in reverse) where start and end are inclusive with their common difference step.
+// Use Array.from(Math.ceil((end+1-start)/step)) to create an array of the desired length(the amounts of elements is equal to (end-start)/step or (end+1-start)/step for inclusive end), Array.map() to fill with the desired values in a range. You can omit start to use a default value of 0. You can omit step to use a default value of 1.
+const initializeArrayWithRangeRight = (end, start, step = 1) =>
+  Array.from({ length: Math.ceil((end + 1 - start) / step )}).map((v, i) => (arr.length - i - 1) * step + start);
+
+// initializeArrayWithValues
+// Initializes and fills an array with the specified values.
+// Use Array(n) to create an array of the desired length, fill(v) to fill it with the desired values. You can omit val to use a default value of 0.
+const initializeArrayWithValues = (length, val = 0) => Array.from({length}).fill(val);
