@@ -173,3 +173,79 @@ const initializeArrayWithRangeRight = (end, start, step = 1) =>
 // Initializes and fills an array with the specified values.
 // Use Array(n) to create an array of the desired length, fill(v) to fill it with the desired values. You can omit val to use a default value of 0.
 const initializeArrayWithValues = (length, val = 0) => Array.from({length}).fill(val);
+
+// intersection
+// Returns a list of elements that exist in both arrays.
+// Create a Set from b, then use Array.filter() on a to only keep values contained in b.
+const intersection = (a, b) => {
+  const s = new Set(b);
+  return a.filter(v => s.has(v));
+};
+
+// intersectionBy
+// Returns a list of elements that exist in both arrays, after applying the provided function to each array element of both.
+// Create a Set by applying fn to all elements in b, then use Array.filter() on a to only keep elements, which produce values contained in b when fn is applied to them.
+const intersectionBy = (a, b, fn) => {
+  const s = new Set(b.map(fn));
+  return a.filter(v => s.has(fn(v)));
+};
+
+// intersectionWith
+// Returns a list of elements that exist in both arrays, using a provided comparator function.
+// Use Array.filter() and Array.findIndex() in combination with the provided comparator to determine intersecting values.
+const intersectionWith = (a, b, comp) => a.filter(x => b.findIndex(y => comp(x,y)) !== -1);
+
+// isSorted
+// Returns 1 if the array is sorted in ascending order, -1 if it is sorted in descending order or 0 if it is not sorted.
+// Calculate the ordering direction for the first two elements. Use Object.entries() to loop over array objects and compare them in pairs. Return 0 if the direction changes or the direction if the last element is reached.
+const isSorted = arr => {
+  let direction = -(arr[0] - arr[1]);
+  for (let [i, val] of arr.entries()) {
+    direction = !direction ? -(arr[i - 1] - arr[i]) : direction;
+    if (i === arr.length - 1) return !direction ? 0 : direction;
+    else if ((val - arr[i + 1]) * direction > 0) return 0;
+  }
+};
+
+// join
+// Joins all elements of an array into a string and returns this string. Uses a separator and an end separator.
+// Use Array.reduce() to combine elements into a string. Omit the second argument, separator, to use a default separator of ','. Omit the third argument, end, to use the same value as separator by default.
+const join = (arr, separator = ',', end = separator) => arr.reduce((acc, val, i) => acc + (i === arr.length - 1 ? end : separator) + val, '').slice(1);
+// standard answer
+const join = (arr, separator = ',', end = separator) =>
+  arr.reduce(
+    (acc, val, i) =>
+      i === arr.length - 2
+        ? acc + val + end
+        : i === arr.length - 1 ? acc + val : acc + val + separator,
+    ''
+  );
+
+// last
+// Returns the last element in an array.
+// Use arr.length - 1 to compute the index of the last element of the given array and returning it.
+const last = arr => arr[-1];
+
+// longestItem
+// Takes any number of iterable objects or objects with a length property and returns the longest one.
+// Use Array.sort() to sort all arguments by length, return the first (longest) one.<Paste>
+const longestItem = (...vals) => vals.sort((a, b) => b.length - a.length)[0];
+
+// mapObject
+// Maps the values of an array to an object using a function, where the key-value pairs consist of the original value as the key and the mapped value.
+// Use an anonymous inner function scope to declare an undefined memory space, using closures to store a return value. Use a new Array to store the array with a map of the function over its data set and a comma operator to return a second step, without needing to move from one context to another (due to closures and order of operations).
+const mapObject = (arr, fn) =>
+  (a => (
+    (a = [arr, arr.map(fn)]), a[0].reduce((acc, val, ind) => ((acc[val] = a[1][ind]), acc), {})
+  ))();
+
+// maxN
+// Returns the n maximum elements from the provided array. If n is greater than or equal to the provided array's length, then return the original array(sorted in descending order).
+// Use Array.sort() combined with the spread operator (...) to create a shallow clone of the array and sort it in descending order. Use Array.slice() to get the specified number of elements. Omit the second argument, n, to get a one-element array.
+const maxN = (arr, n = 1) => [...arr].sort((a, b) => b - a).slice(0, n);
+
+// minN
+// Returns the n minimum elements from the provided array. If n is greater than or equal to the provided array's length, then return the original array(sorted in ascending order).
+// Use Array.sort() combined with the spread operator (...) to create a shallow clone of the array and sort it in ascending order. Use Array.slice() to get the specified number of elements. Omit the second argument, n, to get a one-element array.
+const minN = (arr, n = 1) => [...arr].sort((a, b) => a - b).slice(0, n);
+
