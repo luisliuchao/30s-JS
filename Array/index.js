@@ -249,3 +249,82 @@ const maxN = (arr, n = 1) => [...arr].sort((a, b) => b - a).slice(0, n);
 // Use Array.sort() combined with the spread operator (...) to create a shallow clone of the array and sort it in ascending order. Use Array.slice() to get the specified number of elements. Omit the second argument, n, to get a one-element array.
 const minN = (arr, n = 1) => [...arr].sort((a, b) => a - b).slice(0, n);
 
+// none
+// Returns true if the provided predicate function returns false for all elements in a collection, false otherwise.
+// Use Array.some() to test if any elements in the collection return true based on fn. Omit the second argument, fn, to use Boolean as a default.
+const none = (arr, fn = Boolean) = !arr.some(fn)
+
+// nthElement
+// Returns the nth element of an array.
+// Use Array.slice() to get an array containing the nth element at the first place. If the index is out of bounds, return []. Omit the second argument, n, to get the first element of the array.
+const nthEl = (arr, n = 0) => (n > 0 ? arr.slice(n, n + 1) : arr.slice(n))[0];
+
+// partition
+// Groups the elements into two arrays, depending on the provided function's truthiness for each element.
+// Use Array.reduce() to create an array of two arrays. Use Array.push() to add elements for which fn returns true to the first array and elements for which fn returns false to the second one.
+const partition = (arr, fn = Boolean) => arr.reduce((acc, v, i, arr) => (acc[fn(v, i, arr) ? 0 : 1].push(v), acc), [[], []]);
+
+// permutations
+// ⚠️ WARNING: This function's execution time increases exponentially with each array element. Anything more than 8 to 10 entries will cause your browser to hang as it tries to solve all the different combinations.
+// Generates all permutations of an array's elements (contains duplicates).
+// Use recursion. For each element in the given array, create all the partial permutations for the rest of its elements. Use Array.map() to combine the element with each partial permutation, then Array.reduce() to combine all permutations in one array. Base cases are for array length equal to 2 or 1.
+const permutations = arr => arr.reduce((acc, item, i) =>
+  acc.concat(
+    permutations([...arr.slice(0, i), ...arr.slice(i+1)]).map(val => [item, ...val]);
+  ), []);
+
+// pull
+// Mutates the original array to filter out the values specified.
+// Use Array.filter() and Array.includes() to pull out the values that are not needed. Use Array.length = 0 to mutate the passed in an array by resetting it's length to zero and Array.push() to re-populate it with only the pulled values.
+const pull = (arr, ...args) => {
+  let argState = Array.isArray(args) ? args : args[0];
+  let pulled = arr.filter(v => !args.include(v));
+  // mutate the original array
+  arr.length = 0;
+  pulled.forEach(v => arr.push(v));
+};
+
+// pullAtIndex
+// Mutates the original array to filter out the values at the specified indexes.
+// Use Array.filter() and Array.includes() to pull out the values that are not needed. Use Array.length = 0 to mutate the passed in an array by resetting it's length to zero and Array.push() to re-populate it with only the pulled values. Use Array.push() to keep track of pulled values
+const pullAtIndex = (arr, pullArr) => {
+  const pulled = arr.filter((v, i) => !pullArr.include(i));
+  // mutate the original array
+  arr.length = 0;
+  pulled.forEach(v => arr.push(v));
+};
+
+// pullAtValue
+// Mutates the original array to filter out the values specified. Returns the removed elements.
+// Use Array.filter() and Array.includes() to pull out the values that are not needed. Use Array.length = 0 to mutate the passed in an array by resetting it's length to zero and Array.push() to re-populate it with only the pulled values. Use Array.push() to keep track of pulled values<Paste>
+const pullAtValue = (arr, pullArr) => {
+  let removed = [],
+  pushToRemove = arr.forEach((v, i) => (pullArr.includes(v) ? removed.push(v) : v)),
+  mutateTo = arr.filter((v, i) => !pullArr.includes(v));
+  arr.length = 0;
+  mutateTo.forEach(v => arr.push(v));
+  return removed;
+};
+
+// pullBy
+// Mutates the original array to filter out the values specified, based on a given iterator function.
+// Check if the last argument provided in a function. Use Array.map() to apply the iterator function fn to all array elements. Use Array.filter() and Array.includes() to pull out the values that are not needed. Use Array.length = 0 to mutate the passed in an array by resetting it's length to zero and Array.push() to re-populate it with only the pulled values.
+const pullBy = (arr, ...args) => {
+  const length = args.length;
+  let fn = length > 1 ? args[length - 1] : undefined;
+  fn = typeof fn == 'function' ? (args.pop(), fn) : undefined;
+  let argState = (Array.isArray(args[0]) ? args[0] : args).map(val => fn(val));
+  let pulled = arr.filter((v, i) => !argState.includes(fn(v)));
+  arr.length = 0;
+  pulled.forEach(v => arr.push(v));
+};
+
+// reducedFilter
+// Filter an array of objects based on a condition while also filtering out unspecified keys.
+// Use Array.filter() to filter the array based on the predicate fn so that it returns the objects for which the condition returned a truthy value. On the filtered array, use Array.map() to return the new object using Array.reduce() to filter out the keys which were not supplied as the keys argument.
+const reducedFilter = (data, keys, fn) => data.filter(fn).map(el => keys.reduce((acc, key) => (acc[key] = el[key], acc), {}));
+
+// reduceSuccessive
+// Applies a function against an accumulator and each element in the array (from left to right), returning an array of successively reduced values.
+// Use Array.reduce() to apply the given function to the given array, storing each new result.
+const reduceSuccessive = (arr, fn, acc) => arr.reduce((res, val, i, arr) => (res.push(fn(res.slice(-1)[0], val, i ,arr)), res), [acc]);
