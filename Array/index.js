@@ -328,3 +328,105 @@ const reducedFilter = (data, keys, fn) => data.filter(fn).map(el => keys.reduce(
 // Applies a function against an accumulator and each element in the array (from left to right), returning an array of successively reduced values.
 // Use Array.reduce() to apply the given function to the given array, storing each new result.
 const reduceSuccessive = (arr, fn, acc) => arr.reduce((res, val, i, arr) => (res.push(fn(res.slice(-1)[0], val, i ,arr)), res), [acc]);
+
+// reduceWhich
+// Returns the minimum/maximum value of an array, after applying the provided function to set comparing rule.
+// Use Array.reduce() in combination with the comparator function to get the appropriate element in the array. You can omit the second parameter, comparator, to use the default one that returns the minimum element in the array.
+const reduceWhich = (arr, comp = (a, b) => a - b) => arr.reduce((a, b) => (comp(a ,b) >= 0 ? a : b));
+
+// remove
+// Removes elements from an array for which the given function returns false.
+// Use Array.filter() to find array elements that return truthy values and Array.reduce() to remove elements using Array.splice(). The func is invoked with three arguments (value, index, array).
+const remove = (arr, func) =>
+  Array.isArray(arr)
+    ? arr.filter(func).reduce((acc, val) => {
+        arr.splice(arr.indexOf(val), 1);
+        return acc.concat(val);
+      }, [])
+    : [];
+
+// sample
+// Returns a random element from an array.
+// Use Math.random() to generate a random number, multiply it by length and round it of to the nearest whole number using Math.floor(). This method also works with strings.
+const sample = arr => arr[Math.floor(Math.random() * arr.length)];
+
+// sampleSize
+// Gets n random elements at unique keys from array up to the size of array.
+// Shuffle the array using the Fisher-Yates algorithm. Use Array.slice() to get the first n elements. Omit the second argument, n to get only one element at random from the array.
+const sampleSize = ([...arr], n = 1) => {
+  let m = arr.length;
+  while (m) {
+    const i = Math.floor(Math.random() * m--);
+    [arr[m], arr[i]] = [arr[i], arr[m]];
+  }
+  return arr.slice(0, n);
+};
+
+// shuffle
+// Randomizes the order of the values of an array, returning a new array.
+// Uses the Fisher-Yates algorithm to reorder the elements of the array.
+const shuffle = ([...arr]) => {
+  let m = arr.length;
+  while (m) {
+    const i = Math.floor(Math.random() * m--);
+    [arr[m], arr[i]] = [arr[i], arr[m]];
+  }
+  return arr;
+};
+
+// similarity
+// Returns an array of elements that appear in both arrays.
+// Use Array.filter() to remove values that are not part of values, determined using Array.includes().
+const similarity = (a, b) => {
+  return a.filter(v => b.includes(v));
+};
+
+// sortedIndex
+// Returns the lowest index at which value should be inserted into array in order to maintain its sort order.
+// Check if the array is sorted in descending order (loosely). Use Array.findIndex() to find the appropriate index where the element should be inserted.
+const sortedIndex = (arr, n) => {
+  const isDescending = arr[0] > arr[arr.length - 1];
+  const index = arr.findIndex(v => isDescending ? v <= n : v >= n);
+  return index === -1 ? arr.length : index;
+}
+
+// sortedIndexBy
+// Returns the lowest index at which value should be inserted into array in order to maintain its sort order, based on a provided iterator function.
+// Check if the array is sorted in descending order (loosely). Use Array.findIndex() to find the appropriate index where the element should be inserted, based on the iterator function fn.
+const sortedIndexBy = (arr, n, fn) => {
+  const isDescending = fn(arr[0]) > fn(arr[arr.length - 1]);
+  const val = fn(n);
+  const index = arr.findIndex(el => (isDescending ? val >= fn(el) : val <= fn(el)));
+  return index === -1 ? arr.length : index;
+}
+
+// sortedLastIndex
+// Returns the highest index at which value should be inserted into array in order to maintain its sort order.
+// Check if the array is sorted in descending order (loosely). Use Array.reverse() and Array.findIndex() to find the appropriate last index where the element should be inserted.
+const sortedLastIndex = (arr, n) => {
+  const isDescending = arr[0] > arr[arr.length - 1];
+  const index = arr.reverse().findIndex(el => (isDescending ? n <= el : n >= el));
+  return index === -1 ? 0 : arr.length - index;
+};
+
+// sortedLastIndexBy
+// Returns the highest index at which value should be inserted into array in order to maintain its sort order, based on a provided iterator function.
+// Check if the array is sorted in descending order (loosely). Use Array.map() to apply the iterator function to all elements of the array. Use Array.reverse() and Array.findIndex() to find the appropriate last index where the element should be inserted, based on the provided iterator function.
+const sortedLastIndexBy = (arr, n, fn) => {
+  const isDescending = fn(arr[0]) > fn(arr[arr.length - 1]);
+  const val = fn(n);
+  const index = arr
+    .map(fn)
+    .reverse()
+    .findIndex(el => (isDescending ? val <= el : val >= el));
+  return index === -1 ? 0 : arr.length - index;
+};
+
+// stableSort
+// Performs stable sorting of an array, preserving the initial indexes of items when their values are the same. Does not mutate the original array, but returns a new array instead.
+// Use Array.map() to pair each element of the input array with its corresponding index. Use Array.sort() and a compare function to sort the list, preserving their initial order if the items compared are equal. Use Array.map() to convert back to the initial array items
+const stableSort = (arr, compare) =>
+  arr
+    .map((item, index) => ({ item, index }))
+    .sort((a, b) => compare(a.item, b.item) || a.index - b.index)
+    .map(({ item }) => item);
