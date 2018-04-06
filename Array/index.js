@@ -33,7 +33,7 @@ const compact = (arr) => arr.filter(Boolean);
 
 // countBy
 // Groups the elements of an array based on the given function and returns the count of elements in each group.
-// Use Array.map() to map the values of an array to a function or property name. Use Array.reduce() to create an object, where the keys are produced from the mapped results.<Paste>
+// Use Array.map() to map the values of an array to a function or property name. Use Array.reduce() to create an object, where the keys are produced from the mapped results.
 const countBy(arr, fn) =>
   arr.map(typeof fn === 'function' ? fn: val[fn]).reduce((acc, val, i) => (acc[val] = (acc[val] || 0) + 1, acc), {});
 
@@ -228,7 +228,7 @@ const last = arr => arr[-1];
 
 // longestItem
 // Takes any number of iterable objects or objects with a length property and returns the longest one.
-// Use Array.sort() to sort all arguments by length, return the first (longest) one.<Paste>
+// Use Array.sort() to sort all arguments by length, return the first (longest) one.
 const longestItem = (...vals) => vals.sort((a, b) => b.length - a.length)[0];
 
 // mapObject
@@ -296,7 +296,7 @@ const pullAtIndex = (arr, pullArr) => {
 
 // pullAtValue
 // Mutates the original array to filter out the values specified. Returns the removed elements.
-// Use Array.filter() and Array.includes() to pull out the values that are not needed. Use Array.length = 0 to mutate the passed in an array by resetting it's length to zero and Array.push() to re-populate it with only the pulled values. Use Array.push() to keep track of pulled values<Paste>
+// Use Array.filter() and Array.includes() to pull out the values that are not needed. Use Array.length = 0 to mutate the passed in an array by resetting it's length to zero and Array.push() to re-populate it with only the pulled values. Use Array.push() to keep track of pulled values
 const pullAtValue = (arr, pullArr) => {
   let removed = [],
   pushToRemove = arr.forEach((v, i) => (pullArr.includes(v) ? removed.push(v) : v)),
@@ -430,3 +430,82 @@ const stableSort = (arr, compare) =>
     .map((item, index) => ({ item, index }))
     .sort((a, b) => compare(a.item, b.item) || a.index - b.index)
     .map(({ item }) => item);
+
+// symmetricDifference
+// Returns the symmetric difference between two arrays.
+// Create a Set from each array, then use Array.filter() on each of them to only keep values not contained in the other.
+const symmetricDifference = (a, b) => {
+  const A = new Set(a);
+  const B = new Set(b);
+  return [...a.filter(v => !B.has(v)), ...b.filter(v => !A.has(v))];
+}
+
+// symmetricDifferenceBy
+// Returns the symmetric difference between two arrays, after applying the provided function to each array element of both.
+// Create a Set by applying fn to each array's elements, then use Array.filter() on each of them to only keep values not contained in the other.
+const symmetricDifferenceBy = (a, b, fn) => {
+  const A = new Set(a.map(fn));
+  const B = new Set((b.map(fn)));
+  return [...a.filter(v => !B.has(fn(v))), ...b.filter(v => !A.has(fn(v)))];
+};
+
+// symmetricDifferenceWith
+// Returns the symmetric difference between two arrays, using a provided function as a comparator.
+// Use Array.filter() and Array.findIndex() to find the appropriate values.
+const symmetricDifferenceWith => (a, b, comp) => [
+  ...a.filter(x => b.findIndex(y => comp(x, y)) === -1),
+  ...b.filter(x => a.findIndex(y => comp(x, y)) === -1),
+];
+
+// tail
+// Returns all elements in an array except for the first one.
+// Return Array.slice(1) if the array's length is more than 1, otherwise, return the whole array.
+const tail = arr => arr.length > 1 ? arr.slice(1) : arr;
+
+// take
+// Returns an array with n elements removed from the beginning.
+// Use Array.slice() to create a slice of the array with n elements taken from the beginning.
+const take = (arr, n = 1) => arr.slice(0, n);
+
+// takeRight
+// Returns an array with n elements removed from the end.
+// Use Array.slice() to create a slice of the array with n elements taken from the end.
+const takeRight = (arr, n = 1) => arr.slice(arr.length - n, arr.length);
+
+// takeRightWhile
+// Removes elements from the end of an array until the passed function returns true. Returns the removed elements.
+// Loop through the array, using a for...of loop over Array.keys() until the returned value from the function is true. Return the removed elements, using Array.reverse() and Array.slice()
+const takeRightWhile = (arr, fn) => {
+  for (let i of arr.reverse.key())
+    // arr.reverse will change the original arr value
+    if (fn(arr[i])) return arr.slice(0, i);
+  return arr;
+}
+
+// takeWhile
+// Removes elements in an array until the passed function returns true. Returns the removed elements.
+// Loop through the array, using a for...of loop over Array.keys() until the returned value from the function is true. Return the removed elements, using Array.slice()
+const takeWhile = (arr, fn) => {
+  for (let i of arr.keys())
+    if (fn(arr[i])) return arr.slice(0, i);
+  return arr;
+};
+
+// union
+// Returns every element that exists in any of the two arrays once.
+// Create a Set with all values of a and b and convert to an array.
+const union = (a, b) => Array.from(new Set([...a, ...b]));
+
+// unionBy
+// Returns every element that exists in any of the two arrays once, after applying the provided function to each array element of both.
+// Create a Set by applying all fn to all values of a. Create a Set from a and all elements in b whose value, after applying fn does not match a value in the previously created set. Return the last set converted to an array.
+const unionBy = (a, b, fn) => {
+  const A = new Set(a.map(fn));
+  const B = new Set([...a, ...b.filter(x => !A.has(fn(x)))]);
+  return Array.from(B);
+};
+
+// unionWith
+// Returns every element that exists in any of the two arrays once, using a provided comparator function.
+// Create a Set with all values of a and values in b for which the comparator finds no matches in a, using Array.findIndex().
+const unionWith = (a, b, comp) => Array.from(new Set([...a, ...b.filter(x => a.findIndex(y => comp(x, y)) === -1)]));
