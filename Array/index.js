@@ -509,3 +509,63 @@ const unionBy = (a, b, fn) => {
 // Returns every element that exists in any of the two arrays once, using a provided comparator function.
 // Create a Set with all values of a and values in b for which the comparator finds no matches in a, using Array.findIndex().
 const unionWith = (a, b, comp) => Array.from(new Set([...a, ...b.filter(x => a.findIndex(y => comp(x, y)) === -1)]));
+
+// uniqueElements
+// Returns all unique values of an array.
+// Use ES6 Set and the ...rest operator to discard all duplicated values.
+const uniqueElements = arr => Array.from(new Set(arr));
+// stardard answer
+// const uniqueElements = arr => [...new Set(arr)];
+
+// unzip
+// Creates an array of arrays, ungrouping the elements in an array produced by zip.
+// Use Math.max.apply() to get the longest subarray in the array, Array.map() to make each element an array. Use Array.reduce() and Array.forEach() to map grouped values to individual arrays.
+const unzip = arr =>
+  arr.reduce((acc, val) => (val.forEach((v, i) => acc[i].push(v)), acc), Array.from({
+    length: Math.max(...arr.map(x => x.length)),
+  }).map(x => [])
+);
+
+// unzipWith
+// Creates an array of elements, ungrouping the elements in an array produced by zip and applying the provided function.
+// Use Math.max.apply() to get the longest subarray in the array, Array.map() to make each element an array. Use Array.reduce() and Array.forEach() to map grouped values to individual arrays. Use Array.map() and the spread operator (...) to apply fn to each individual group of elements.
+const unzipWith = (arr, fn) => unzip(arr).map(val => fn(...val));
+
+// without
+// Filters out the elements of an array, that have one of the specified values.
+// Use Array.filter() to create an array excluding(using !Array.includes()) all given values.
+// (For a snippet that mutates the original array see pull)
+const without = (arr, ...args) => arr.filter(v => !args.include(v));
+
+// xProd
+// Creates a new array out of the two supplied by creating each possible pair from the arrays.
+// Use Array.reduce(), Array.map() and Array.concat() to produce every possible pair from the elements of the two arrays and save them in an array.
+const xProd = (a, b) => a.reduce((acc, x) => acc.concat(b.map(y => [x, y])), []);
+
+// zip
+// Creates an array of elements, grouped based on the position in the original arrays.
+// Use Math.max.apply() to get the longest array in the arguments. Creates an array with that length as return value and use Array.from() with a map-function to create an array of grouped elements. If lengths of the argument-arrays vary, undefined is used where no value could be found.
+const zip = (...arr) => {
+  const maxLength = Math.max(...arr.map(x => x.length));
+  return Array.from({length: maxLength}).map((_, i) => {
+    return Array.from({length: arr.length}, (_, k) => arr[k][i]);
+  });
+};
+
+// zipObject
+// Given an array of valid property identifiers and an array of values, return an object associating the properties to the values.
+// Since an object can have undefined values but not undefined property pointers, the array of properties is used to decide the structure of the resulting object using Array.reduce().
+const zipObject = (props, values) => props.reduce((acc, prop, i) => (acc[prop] = values[i], acc), {});
+
+// zipWith
+// Creates an array of elements, grouped based on the position in the original arrays and using function as the last value to specify how grouped values should be combined.
+// Check if the last argument provided is a function. Use Math.max() to get the longest array in the arguments. Creates an array with that length as return value and use Array.from() with a map-function to create an array of grouped elements. If lengths of the argument-arrays vary, undefined is used where no value could be found. The function is invoked with the elements of each group (...group).
+const zipWith = (...arr, fn) => zip(...arr).map(val => fn(...val));
+// standard answer
+// const zipWith = (...array) => {
+//   const fn = typeof array[array.length - 1] === 'function' ? array.pop() : undefined;
+//   return Array.from(
+//     { length: Math.max(...array.map(a => a.length)) },
+//     (_, i) => (fn ? fn(...array.map(a => a[i])) : array.map(a => a[i]))
+//   );
+// };
