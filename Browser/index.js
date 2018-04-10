@@ -200,7 +200,7 @@ const recordAnimationFrames = (callback, autoStart = true) => {
     run();
   };
   const run = () => {
-    raf = requestAnimationFram(() => {
+    raf = requestAnimationFrame(() => {
       callback();
       if (running) run();
     });
@@ -215,3 +215,62 @@ const recordAnimationFrames = (callback, autoStart = true) => {
 //  Use window.location.href or window.location.replace() to redirect to url. Pass a second argument to simulate a link click (true - default) or an HTTP redirect (false).
 const redirect = (url, asLink = true) =>
   asLink ? (window.location.href = url) : window.location.replace(url);
+
+// runAsync
+// Runs a function in a separate thread by using a Web Worker, allowing long running functions to not block the UI.
+// Create a new Worker using a Blob object URL, the contents of which should be the stringified version of the supplied function. Immediately post the return value of calling the function back. Return a promise, listening for onmessage and onerror events and resolving the data posted back from the worker, or throwing an error.
+const runAsync = fn => {
+  const worker = new Worker(
+    URL.createObjectURL(new Blob([`postMessage((${fn})());`]), {
+      type: 'application/javascript; charset=utf-8'
+    })
+  );
+  return new Promise((res, rej) => {
+    worker.onmessage = ({ data }) => {
+      res(data), worker.terminate();
+    };
+    worker.onerror = err => {
+      rej(err), worker.terminate();
+    };
+  });
+}
+
+// scrollToTop
+// Smooth-scrolls to the top of the page.
+// Get distance from top using document.documentElement.scrollTop or document.body.scrollTop. Scroll by a fraction of the distance from the top. Use window.requestAnimationFrame() to animate the scrolling.
+const scrollTop = () => {
+  const c = document.documentElement.scrollTop || document.body.scrollTop;
+  if (c > 0) {
+    window.requestAnimationFrame(scrollTop);
+    window.scrollTo(0, c - c/8);
+  }
+};
+
+// setStyle
+// Sets the value of a CSS rule for the specified element.
+// Use element.style to set the value of the CSS rule for the specified element to val.
+const setStyle = (el, ruleName, val) => el.style[ruleName] = val;
+
+// show
+// Shows all the elements specified.
+// Use the spread operator (...) and Array.forEach() to clear the display property for each element specified.
+const show = (...el) => el.forEach(e => e.style.display = '');
+
+// smoothScroll
+// Smoothly scrolls the element on which it's called into the visible area of the browser window.
+// Use .scrollIntoView method to scroll the element. Pass { behavior: 'smooth' } to .scrollIntoView so it scrolls smoothly.
+const smoothScroll = el =>
+  document.querySelector(el).scrollIntoView({behavior: 'smooth'});
+
+// toggleClass
+// Toggle a class for an element.
+// Use element.classList.toggle() to toggle the specified class for the element.
+const toggleClass = (el, className) => el.classList.toggle(className);
+
+// UUIDGeneratorBrowser
+// Generates a UUID in a browser.
+// Use crypto API to generate a UUID, compliant with RFC4122 version 4.
+const UUIDGeneratorBrowse = () =>
+  ([1e7] + -1e3 + -4e3 + -8e3 + -1e11).replace(/[018]/g, c =>
+    (c ^ (crypto.getRandomValues(new Uint8Array(1))[0] & (15 >> (c / 4)))).toString(16)
+  );
