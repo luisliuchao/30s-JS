@@ -67,3 +67,97 @@ const debounce = (fn, ms = 0) => {
 // Use setTimeout() with a timeout of 1ms to add a new event to the browser event queue and allow the rendering engine to complete its work. Use the spread (...) operator to supply the function with an arbitrary number of arguments.
 const defer = (fn, ...args) => setTimeout(fn, 1, ...args);
 
+// delay
+// Invokes the provided function after wait milliseconds.
+// Use setTimeout() to delay execution of fn. Use the spread (...) operator to supply the function with an arbitrary number of arguments.
+const delay = (fn, ms, ...args) => setTimeout(() => fn(...args), ms);
+// standard answer
+const deplay = (fn, wait, ...args) => setTimeout(fn, wait, ...args);
+
+// functionName
+// Logs the name of a function.
+// Use console.debug() and the name property of the passed method to log the method's name to the debug channel of the console.
+const functionName = fn => (console.debug(fn.name), fn);
+
+// hz
+// Returns the number of times a function executed per second. hz is the unit for hertz, the unit of frequency defined as one cycle per second.
+// Use performance.now() to get the difference in milliseconds before and after the iteration loop to calculate the time elapsed executing the function iterations times. Return the number of cycles per second by converting milliseconds to seconds and dividing it by the time elapsed. Omit the second argument, iterations, to use the default of 100 iterations.
+const hz = (fn, iterations = 100) => {
+  const before = performance.now();
+  for(let i = 0; i < iterations; i++) fn()
+  return 1000 * iterations / (performance.now() - before);
+};
+
+// memoize
+// Returns the memoized (cached) function.
+// Create an empty cache by instantiating a new Map object. Return a function which takes a single argument to be supplied to the memoized function by first checking if the function's output for that specific input value is already cached, or store and return it if not. The function keyword must be used in order to allow the memoized function to have its this context changed if necessary. Allow access to the cache by setting it as a property on the returned function.
+const memorize = fn => {
+  const cache = new Map();
+  const cached = function(val) {
+    return cache.has(val) ? cache.get(val) : cache.set(val, fn.call(this, val)) && cache.get(val);
+  }
+  cached.cache = cache;
+  return cached;
+};
+
+
+// negate
+// Negates a predicate function.
+// Take a predicate function and apply the not operator (!) to it with its arguments.
+const negate = fn => (...args) => !fn(...args);
+
+// once
+// Ensures a function is called only once.
+// Utilizing a closure, use a flag, called, and set it to true once the function is called for the first time, preventing it from being called again. In order to allow the function to have its this context changed (such as in an event listener), the function keyword must be used, and the supplied function must have the context applied. Allow the function to be supplied with an arbitrary number of arguments using the rest/spread (...) operator.
+const once = fn => {
+  let called = false;
+  return function(...args) {
+    if (called) return;
+    called = true;
+    fn.apply(this, ...args);
+  };
+};
+
+// partial
+// Creates a function that invokes fn with partials prepended to the arguments it receives.
+// Use the spread operator (...) to prepend partials to the list of arguments of fn.
+const partial = (fn, ...partials) => (...args) => fn(...partials, ...args);
+
+// partialRight
+// Creates a function that invokes fn with partials appended to the arguments it receives.
+// Use the spread operator (...) to append partials to the list of arguments of fn.
+const partialRight = (fn, ...partials) => (...args) =>fn(...args, ...partials);
+
+// runPromisesInSeries
+// Runs an array of promises in series.
+// Use Array.reduce() to create a promise chain, where each promise returns the next promise when resolved.
+const runPromiseInSeries = ps => ps.reduce((p, next) => p.then(next), Promise.resolve());
+
+// sleep
+// Delays the execution of an asynchronous function.
+// Delay executing part of an async function, by putting it to sleep, returning a Promise
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+// throttle
+// Creates a throttled function that only invokes the provided function at most once per every wait milliseconds
+// Use setTimeout() and clearTimeout() to throttle the given method, fn. Use Function.apply() to apply the this context to the function and provide the necessary arguments. Use Date.now() to keep track of the last time the throttled function was invoked. Omit the second argument, wait, to set the timeout at a default of 0 ms.
+const throttle = (fn, wait) => {
+  let inThrottle, lastFn, lastTime;
+  return function() {
+    const context = this;
+    const args = arguments;
+    if (!inThrottle) {
+      fn.apply(context, args);
+      lastTime = Date.now();
+      inThrottle = true;
+    } else {
+      clearTimeout(lastFn);
+      lastFn = setTimeout(function() {
+        if (Date.now() - lastTime >= wait) {
+          fn.apply(context, args);
+          lastTime = Date.now();
+        }
+      }, wait - (Date.now() - lastTime));
+    }
+  };
+};
