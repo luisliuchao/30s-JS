@@ -161,3 +161,30 @@ const throttle = (fn, wait) => {
     }
   };
 };
+
+// times
+// Iterates over a callback n times
+// Use Function.call() to call fn n times or until it returns false. Omit the last argument, context, to use an undefined object (or the global object in non-strict mode).
+const times = (n, fn, context = undefined) => {
+  let i = 0;
+  while (fn.call(context, i) !== false && ++i < n) {}
+};
+
+// uncurry
+// Uncurries a function up to depth n.
+// Return a variadic function. Use Array.reduce() on the provided arguments to call each subsequent curry level of the function. If the length of the provided arguments is less than n throw an error. Otherwise, call fn with the proper amount of arguments, using Array.slice(0, n). Omit the second argument, n, to uncurry up to depth 1.
+const uncurry = (fn, n = 1) => (...args) => {
+  const next = acc => params => params.reduce((x, y) => x(y), acc);
+  if (n > args.length) throw new RangeError('Arguments too few');
+  return next(fn)(args.slice(0, n));
+};
+
+// unfold
+// Builds an array, using an iterator function and an initial seed value.
+// Use a while loop and Array.push() to call the function repeatedly until it returns false. The iterator function accepts one argument (seed) and must always return an array with two elements ([value, nextSeed]) or false to terminate.
+const unfold = (fn, seed) => {
+  let result = [];
+  let val = [null, seed];
+  while ((val = fn[val[1]])) result.push(val[0]);
+  return result;
+};
