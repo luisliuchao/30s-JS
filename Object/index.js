@@ -166,9 +166,113 @@ const merge = (...objs) =>
 // nest
 // Given a flat array of objects linked to one another, it will nest them recursively. Useful for nesting comments, such as the ones on reddit.com.
 // Use recursion. Use Array.filter() to filter the items where the id matches the link, then Array.map() to map each one to a new object that has a children property which recursively nests the items based on which ones are children of the current item. Omit the second argument, id, to default to null which indicates the object is not linked to another one (i.e. it is a top level object). Omit the third argument, link, to use 'parent_id' as the default property which links the object to another one by its id.
-
+const nest = (items, id = null, link = 'parent_id') =>
+  items.filter(item => item[link] === id).map(item => ({
+    ...item,
+    children: nest(items, item.id),
+  }));
 
 // objectFromPairs
 // Creates an object from the given key-value pairs.
 // Use Array.reduce() to create and combine key-value pairs.
+const objectFromPairs = arr => arr.reduce((a, v) => ((a[v[0]] = v[1]), a), {});
 
+// objectToPairs
+// Creates an array of key-value pair arrays from an object.
+//   Use Object.keys() and Array.map() to iterate over the object's keys and produce an array with key-value pairs.
+const objectToPairs = obj => Object.keys(obj).map(k => [k, obj[k]]);
+
+// omit
+// Omits the key-value pairs corresponding to the given keys from an object.
+// Use Object.keys(obj), Array.filter() and Array.includes() to remove the provided keys. Use Array.reduce() to convert the filtered keys back to an object with the corresponding key-value pairs.
+const omit = (obj, arr) =>
+  Object.keys(obj).filter(k => !arr.includes(k)).reduce((acc, key) => (acc[key] = obj[key], acc), {});
+
+// omitBy
+// Creates an object composed of the properties the given function returns falsey for. The function is invoked with two arguments: (value, key).
+// Use Object.keys(obj) and Array.filter()to remove the keys for which fn returns a truthy value. Use Array.reduce() to convert the filtered keys back to an object with the corresponding key-value pairs.
+const omitBy = (obj, fn) =>
+  Object.keys(obj)
+    .filter(k => !fn(obj[k], k))
+    .reduce((acc, key) => ((acc[key] = obj[key]), acc), {});
+
+// orderBy
+// Returns a sorted array of objects ordered by properties and orders.
+// Uses Array.sort(), Array.reduce() on the props array with a default value of 0, use array destructuring to swap the properties position depending on the order passed. If no orders array is passed it sort by 'asc' by default.
+const orderBy = (arr, props, orders) =>
+  [...arr].sort((a, b) =>
+    props.reduce((acc, prop, i) => {
+      if (acc === 0) {
+        const [p1, p2] = orders && orders[i] === 'desc' ? [b[prop], a[prop]] : [a[prop], b[prop]];
+        acc = p1 > p2 ? 1 : p1 < p2 ? -1 : 0;
+      }
+      return acc;
+    }, 0)
+  );
+
+// pick
+// Picks the key-value pairs corresponding to the given keys from an object.
+// Use Array.reduce() to convert the filtered/picked keys back to an object with the corresponding key-value pairs if the key exists in the object.
+const pick = (obj, arr) =>
+  arr.reduce((acc, key) => (key in obj && acc[key] = obj[key], acc), {});
+
+// pickBy
+// Creates an object composed of the properties the given function returns truthy for. The function is invoked with two arguments: (value, key).
+// Use Object.keys(obj) and Array.filter()to remove the keys for which fn returns a falsey value. Use Array.reduce() to convert the filtered keys back to an object with the corresponding key-value pairs.
+const pickBy = (obj, fn) =>
+  Object.keys(obj)
+    .filter(k => fn(obj[k], k))
+    .reduce((acc, key) => ((acc[key] = obj[key]), acc), {});
+
+// renameKeys
+// Replaces the names of multiple object keys with the values provided.
+// Use Object.keys() in combination with Array.reduce() and the spread operator (...) to get the object's keys and rename them according to keysMap.
+const renameKeys = (obj, keyMaps) =>
+  Object.keys(obj).reduce((acc, key) => ({
+    ...acc,
+    ...{
+      [keyMaps[key] || key]: obj[key],
+    }
+  }), {});
+
+// shallowClone
+// Creates a shallow clone of an object.
+// Use Object.assign() and an empty object ({}) to create a shallow clone of the original.
+const shallowClone = obj => Object.assign({}, obj);
+
+// size
+// Get size of arrays, objects or strings.
+// Get type of val (array, object or string). Use length property for arrays. Use length or size value if available or number of keys for objects. Use size of a Blob object created from val for strings.
+// Splize = val =>
+  Array.isArray(val)
+    ? val.length
+    : val && typeof val === 'object'
+      ? val.size || val.length || Object.keys(val).length
+      : typeof val === 'string' ? new Blob([val]).size : 0;
+
+//  transform
+// Applies a function against an accumulator and each key in the object (from left to right).
+//  Use Object.keys(obj) to iterate over each key in the object, Array.reduce() to call the apply the specified function against the given accumulator.
+const transform = (obj, fn, acc) => Object.keys(obj).reduce((a, k) => fn(a, obj[k], k, obj), acc);
+
+// truthCheckCollection
+// Checks if the predicate (second argument) is truthy on all elements of a collection (first argument).
+// Use Array.every() to check if each passed object has the specified property and if it returns a truthy value.
+const truthCheckCollection = (collection, pre) => collection.every(obj => obj[pre]);
+
+// unflattenObject
+// Unlatten an object with the paths for keys.
+// Use Object.keys(obj) combined with Array.reduce() to convert flattened path node to a leaf node. If the value of a key contains a dot delimiter (.), use Array.split('.'), string transformations and JSON.parse() to create an object, then Object.assign() to create the leaf node. Otherwise, add the appropriate key-value pair to the accumulator object.
+const unflattenObject = obj =>
+  Object.keys(obj).reduce((acc, k) => {
+    const value = obj[k];
+    if (k.indexOf('.') === -1) {
+      acc[k] = value;
+    } else {
+      const keys = k.split('.');
+      acc[keys.shift()] = unflattenObject({
+        [keys.join('.')]: value
+      });
+    }
+    return acc;
+  }, {});
