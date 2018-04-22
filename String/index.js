@@ -78,3 +78,71 @@ const isLowerCase = str => str === str.toLowerCase();
 // Checks if a string is upper case.
 // Convert the given string to upper case, using String.toUpperCase() and compare it to the original.
 const isUpperCase = str => str === str.toUpperCase();
+
+// mask
+// Replaces all but the last num of characters with the specified mask character.
+// Use String.slice() to grab the portion of the characters that need to be masked and use String.replace() with a regexp to replace every character with the mask character. Concatenate the masked characters with the remaining unmasked portion of the string. Omit the second argument, num, to keep a default of 4 characters unmasked. If num is negative, the unmasked characters will be at the start of the string. Omit the third argument, mask, to use a default character of '*' for the mask.
+const mask = (cc, num= 4, mask = '*') =>
+  ('' + cc).slice(0, -num).replace(/./g, mask) + ('' + cc).slice(-num);
+
+// pad
+// Pads a string on both sides with the specified character, if it's shorter than the specified length.
+// Use String.padStart() and String.padEnd() to pad both sides of the given string. Omit the third argument, char, to use the whitespace character as the default padding character.
+const pad = (str, length, char = ' ') =>
+  str.padStart((str.length + length)/2, char).padEnd(length, char);
+
+// palindrome
+// Returns true if the given string is a palindrome, false otherwise.
+// Convert string String.toLowerCase() and use String.replace() to remove non-alphanumeric characters from it. Then, String.split('') into individual characters, Array.reverse(), String.join('') and compare to the original, unreversed string, after converting it String.tolowerCase().
+const palindrome = str => {
+  const s = str.toLowerCase().replace(/[\W_]/g, '');
+  return s === s.split('').reverse().join('');
+};
+
+// pluralize
+// Returns the singular or plural form of the word based on the input number. If the first argument is an object, it will use a closure by returning a function that can auto-pluralize words that don't simply end in s if the supplied dictionary contains the word.
+// If num is either -1 or 1, return the singular form of the word. If num is any other number, return the plural form. Omit the third argument to use the default of the singular word + s, or supply a custom pluralized word when necessary. If the first argument is an object, utilize a closure by returning a function which can use the supplied dictionary to resolve the correct plural form of the word.
+const pluralize = (val, word, plural = word + 's') => {
+  const _pluralize = (num, word, plural = word + 's') =>
+    [1, -1].includes(Number(num)) ? word : plural;
+  if (typeof val === 'object') return (num, word) => _pluralize(num, word, val[word]);
+  return _pluralize(val, word, plural);
+};
+
+// removeNonASCII
+// Removes non-printable ASCII characters.
+// Use a regular expression to remove non-printable ASCII characters.
+const removeNonASCII = str => str.replace(/[^\x20-\x7E]/g, '');
+
+// reverseString
+// Reverses a string.
+// Use the spread operator (...) and Array.reverse() to reverse the order of the characters in the string. Combine characters to get a string using String.join('').
+const reverseString = str => [...str].reverse().join();
+
+// sortCharactersInString
+// Alphabetically sorts the characters in a string.
+// Use the spread operator (...), Array.sort() and String.localeCompare() to sort the characters in str, recombine using String.join('').
+const sortCharacterInString = str => [...str].sort((a, b) => a.localeCompare(b)).join();
+
+// splitLines
+// Splits a multiline string into an array of lines.
+// Use String.split() and a regular expression to match line breaks and create an array.
+const splitLines = str => str.split(/\r?\n/);
+
+// stripHTMLTags
+// Removes HTML/XML tags from string.
+// Use a regular expression to remove HTML/XML tags from a string.
+const stripHTMLTags = str => str.replace(/<[^>]*>/g, '');
+
+// toCamelCase
+// Converts a string to camelcase.
+// Break the string into words and combine them capitalizing the first letter of each word, using a regexp.
+const toCamelCase = str => {
+  let s =
+    str &&
+    str
+      .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+      .map(x => x.slice(0, 1).toUpperCase() + x.slice(1).toLowerCase())
+      .join('');
+  return s.slice(0, 1).toLowerCase() + s.slice(1);
+};
