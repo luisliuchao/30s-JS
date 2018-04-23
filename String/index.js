@@ -146,3 +146,64 @@ const toCamelCase = str => {
       .join('');
   return s.slice(0, 1).toLowerCase() + s.slice(1);
 };
+
+// toKebabCase
+// Converts a string to kebab case.
+// Break the string into words and combine them adding - as a separator, using a regexp.
+const toKebabCase = str =>
+  str &&
+  str
+    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+    .map(x => x.toLowerCase())
+    .join('-');
+
+// toSnakeCase
+// Converts a string to snake case.
+// Break the string into words and combine them adding _ as a separator, using a regexp.
+const toSnakeCase = str =>
+  str &&
+  str
+    .match(/[A-Z]{2,}(?=[A-Z][a-z]+[0-9]*|\b)|[A-Z]?[a-z]+[0-9]*|[A-Z]|[0-9]+/g)
+    .map(x => x.toLowerCase())
+    .join('_');
+
+// truncateString
+// Truncates a string up to a specified length.
+// Determine if the string's length is greater than num. Return the string truncated to the desired length, with '...' appended to the end or the original string.
+const truncateString = (str, num) =>
+  str.length > num ? str.slice(0, num > 3 ? num - 3 : num) + '...' : str;
+
+// unescapeHTML
+// Unescapes escaped HTML characters.
+// Use String.replace() with a regex that matches the characters that need to be unescaped, using a callback function to replace each escaped character instance with its associated unescaped character using a dictionary (object).
+const unescapeHTML = str =>
+  str.replace(
+    /&amp;|&lt;|&gt;|&#39;|&quot;/g,
+    tag =>
+      ({
+        '&amp;': '&',
+        '&lt;': '<',
+        '&gt;': '>',
+        '&#39;': "'",
+        '&quot;': '"'
+      }[tag] || tag)
+  );
+
+// URLJoin
+// Joins all given URL segments together, then normalizes the resulting URL.
+// Use String.join('/') to combine URL segments, then a series of String.replace() calls with various regexps to normalize the resulting URL (remove double slashes, add proper slashes for protocol, remove slashes before parameters, combine parameters with '&' and normalize first parameter delimiter).
+const URLJoin = (...args) =>
+  args
+    .join('/')
+    .replace(/[\/]+/g, '/')
+    .replace(/^(.+):\//, '$1://')
+    .replace(/^file:/, 'file:/')
+    .replace(/\/(\?|&|#[^!])/g, '$1')
+    .replace(/\?/g, '&')
+    .replace('&', '?');
+
+// words
+// Converts a given string into an array of words.
+// Use String.split() with a supplied pattern (defaults to non-alpha as a regexp) to convert to an array of strings. Use Array.filter() to remove any empty strings. Omit the second argument to use the default regexp.
+const words = (str, pattern = /[^a-zA-Z-]+/) => str.split(pattern).filter(Boolean);
+
